@@ -1,0 +1,51 @@
+{% extends 'plotter.html' %}
+
+{% block agent_modal %}
+
+<!--Convert or Remove Agent Modal -->
+<div class="modal fade modal-form-centered" id="conv_rem_agent_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="conv_rem_agent_character">Add Agent's Mission or Remove Agent?</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#convert_agent_modal">
+                New Mission
+            </button>
+            <a type="button" class="btn btn-primary" href="{{ url_for('process', pars=('convert_agent', agent)) }}"aria-label="Close">
+                Remove Agent
+            </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--Convert Agent Modal -->
+<div class="modal fade modal-form-centered" id="convert_agent_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="convert_agent">Enter Agent's Mission Details</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+          <form method="post" novalidate>
+            {{ choose_char_form.csrf_token() }}
+            {{ render_field(convert_agent_form.dest_system) }}
+            {{ render_field(convert_agent_form.jumps) }}
+            {{ render_field(convert_agent_form.submit_conv) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% endblock %}

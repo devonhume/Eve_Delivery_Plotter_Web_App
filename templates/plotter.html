@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% from 'bootstrap4/form.html' import render_field %}
+
+{% block content %}
+{% include "header.html" %}
+
+  <!-- Page Header -->
+  <header class="masthead" style="background-image: url('/static/images/EveBanner_1920.png')">
+    <div class="overlay"></div>
+    <div class="container">
+      <div class="row">
+        <div class="col-lg-8 col-md-10 mx-auto">
+          <div class="site-heading">
+            <h1>Eve Mission Plotter</h1>
+            <span class="subheading">A tool for plotting Eve Online delivery missions.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+<div>
+    <p>Character: {{ data.character.name }}<br>
+    Current System: {{ data.character.current_system }}</p>
+    <div class="clearfix">
+          <a class="btn btn-primary float-right" data-toggle="modal" data-target="#current_system_modal">Change</a>
+    </div>
+    Current Destination: {{ data.current_destination }}<br>
+</div>
+<hr>
+<div>
+    <div class="clearfix">
+          <a class="btn btn-primary" href="{{url_for('home')}}">Jump</a>
+    </div>
+</div>
+<hr>
+<div class="container">
+    <h3>Active Missions:</h3>
+    <table class="table">
+        <tr>
+            <td>Agent</td>
+            <td>System</td>
+            <td>Distance</td>
+        </tr>
+        {% if data.missions %}
+        {% for mission in data.missions %}
+            <tr>
+                <td><a href="{{ url_for('mission-modal', mission=mission['id']) }}">{{ mission['agent'] }}</a></td>
+                <td>{{ mission['system'] }}</td>
+                <td>{{ mission['jumps'] }}</td>
+            </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+    Click Agent to Complete or Cancel Mission
+</div>
+<hr>
+<div class="container">
+    <h3>Waiting Agents:</h3>
+    <table class="table">
+        <tr>
+            <td>Agent</td>
+            <td>System</td>
+            <td>Distance</td>
+        </tr>
+        {% if data.agents %}
+        {% for agent in data.agents %}
+            <tr>
+                <td><a href="{{ url_for('agent_modal', agent=agent['agent']) }}">{{ agent['agent'] }}</a></td>
+                <td>{{ agent['system'] }}</td>
+                <td>{{ agent['jumps'] }}</td>
+            </tr>
+        {% endfor %}
+        {% endif %}
+    </table>
+    Click Agent to Convert to Mission or Remove Agent<br>
+    <a class="btn btn-primary" data-toggle="modal" data-target="#add_agent_modal">Add New Agent</a>
+</div>
+
+<!-- Add Character Modal -->
+<div class="modal fade modal-form-centered" id="add_character_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add_character">Add Your Character</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+          <form method="post" novalidate>
+            {{ data.char_form.csrf_token() }}
+            {{ render_field(data.char_form.name) }}
+            {{ render_field(data.char_form.system) }}
+            {{ render_field(data.char_form.submit_char) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Confirm Character Modal -->
+<div class="modal fade modal-form-centered" id="confirm_character_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          {% set character = data.char[0] %}
+            {% if character %}
+            <h5 class="modal-title" id="confirm_character">Use character: {{ character.name }}?</h5>
+            {% endif %}
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+            <a type="button" class="btn btn-primary" href="{{ url_for('process', pars='set_char,' + character.name) }}"aria-label="Close">
+                Use This Character
+            </a>
+            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#add_character_modal">
+                Add New Character
+            </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!-- Choose Character Modal -->
+<div class="modal fade modal-form-centered" id="choose_character_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="choose_character">Choose Which Character To Use</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+          <form method="post" novalidate>
+            {{ data.choose_char_form.csrf_token() }}
+            {{ render_field(data.choose_char_form.char) }}
+            {{ render_field(data.choose_char_form.submit_choice) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--Change Current System Modal -->
+<div class="modal fade modal-form-centered" id="current_system_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="current_system_character">Change Current System</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+          <form method="post" novalidate>
+            {{ data.choose_char_form.csrf_token() }}
+            {{ render_field(data.current_system_form.system) }}
+            {{ render_field(data.current_system_form.submit_cs) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<!--Add Agent Modal -->
+<div class="modal fade modal-form-centered" id="add_agent_modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="add_agent_character">Add New Agent</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          {{ modal_messages() }}
+          <form method="post" novalidate>
+            {{ data.add_agent_form.csrf_token() }}
+            {{ render_field(data.add_agent_form.agent_name) }}
+            {{ render_field(data.add_agent_form.system) }}
+            {{ render_field(data.add_agent_form.jumps) }}
+            {{ render_field(data.add_agent_form.submit_agent) }}
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+{% block agent_modal %}{% endblock %}
+{% block mission_modal %}{% endblock %}
+
+{% include "footer.html" %}
+
+{% endblock %}
+
+{% block script %}
+    {% if not character %}
+        {% if flag == 0 %}
+            <script>
+                var myModal = new bootstrap.Modal(document.getElementById('add_character_modal'))
+                myModal.show()
+            </script>
+        {% endif %}
+        {% if flag == 1 %}
+            <script>
+                var myModal = new bootstrap.Modal(document.getElementById('confirm_character_modal'))
+                myModal.show()
+            </script>
+        {% endif %}
+        {% if flag|int > 1 %}
+            <script>
+                var myModal = new bootstrap.Modal(document.getElementById('choose_character_modal'))
+                myModal.show()
+            </script>
+        {% endif %}
+    {% endif %}
+{% endblock %}

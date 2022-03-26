@@ -1,0 +1,13 @@
+{
+    "current_system": "Egghelende",
+    "agents": {
+        "Broen Azer": {
+            "name": "Broen Azer",
+            "system": "Ney",
+            "status": "waiting",
+            "jumps": 4,
+            "missions": []
+        }
+    },
+    "missions": {}
+}
